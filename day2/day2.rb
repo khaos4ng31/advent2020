@@ -9,30 +9,41 @@
 
 class Password
 	PASS_PATTERN = /(?<lower>\d+)-(?<upper>\d+) (?<req>\w): (?<pass>\w+)/
-	@@isValid = true
+	@@isValid_a = false
+	@@isValid_b = false
 
 	def initialize(line)
 		# input = `lower-upper req: password`
 		m = PASS_PATTERN.match(line)
 		@@lower, @@upper, @@req, @@password = m[1..4]
-		x = @@password.count @@req
-		@@isValid = (@@lower.to_i <= x && x <= @@upper.to_i) ? true : false
+		repeated = @@password.count @@req
+		
+		@@isValid_a = (@@lower.to_i <= repeated && repeated <= @@upper.to_i)
+		@@isValid_b = (@@password[(@@lower.to_i)-1] === @@req) ^ (@@password[(@@upper.to_i)-1] === @@req)
 	end
 
-	def isValid
-		return @@isValid
+	def isValid_a
+		return @@isValid_a
+	end
+
+	def isValid_b
+		return @@isValid_b
 	end
 
 end
 
-count = 0
-File.foreach("pass.txt") { 
+count_a = 0
+count_b = 0
+File.foreach("pass.txt") {
 	|line| 
 	p = Password.new(line)
-	count += p.isValid ? 1:0
+	count_a += p.isValid_a ? 1:0
+	count_b += p.isValid_b ? 1:0
 }
 
-puts "Part 1: " + count.to_s
+puts "Part 1: " + count_a.to_s
+puts "Part 2: " + count_b.to_s
+puts "abcd"[0]
 
 # defining classes was for purpose of learning Ruby syntax and whatnot
 # yeah I know I could probably do it better but the purpose
